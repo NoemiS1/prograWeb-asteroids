@@ -5,14 +5,27 @@ let x = canvas.width / 2
 let y = canvas.height / 2
 let angle = 0
 let keys = {}
+let bullets = []
+let vx = 0
+let vy = 0
 
-document.addEventListener('keydown', (e) => (keys[e.key] = true))
-document.addEventListener('keyup', (e) => (keys[e.key] = false))
+document.addEventListener('keydown', (e) => {
+  keys[e.key] = true
+
+  if (e.key === ' ') {
+    shoot()
+  }
+})
+
+document.addEventListener('keyup', (e) => {
+  keys[e.key] = false
+})
 
 function drawShip() {
   ctx.save()
   ctx.translate(x, y)
   ctx.rotate(angle)
+
   ctx.beginPath()
   ctx.moveTo(15, 0)
   ctx.lineTo(-10, 10)
@@ -20,27 +33,83 @@ function drawShip() {
   ctx.closePath()
   ctx.strokeStyle = 'white'
   ctx.stroke()
+
   ctx.restore()
 }
 
+function shoot() {
+  bullets.push({
+    x: x + Math.cos(angle) * 15,
+    y: y + Math.sin(angle) * 15,
+    angle: angle,
+    speed: 6
+  })
+}
+
+function drawBullets() {
+  bullets.forEach((bullet) => {
+    ctx.beginPath()
+    ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2)
+    ctx.fillStyle = 'white'
+    ctx.fill()
+  })
+}
+
+function updateBullets() {
+  bullets.forEach((bullet) => {
+    bullet.x += Math.cos(bullet.angle) * bullet.speed
+    bullet.y += Math.sin(bullet.angle) * bullet.speed
+  })
+
+  bullets = bullets.filter(
+    (bullet) =>
+      bullet.x >= 0 && bullet.x <= canvas.width && bullet.y >= 0 && bullet.y <= canvas.height
+  )
+}
+
 function update() {
+  //rotacion
   if (keys['ArrowLeft']) angle -= 0.05
   if (keys['ArrowRight']) angle += 0.05
+
+  //aceleracion
   if (keys['ArrowUp']) {
-    x += Math.cos(angle) * 3
-    y += Math.sin(angle) * 3
+    vx += Math.cos(angle) * 0.1
+    vy += Math.sin(angle) * 0.1
   }
-  // Mantener nave dentro del canvas
+
+  //limitar lavelocidad
+  const maxSpeed = 5
+
+  if (vx > maxSpeed) vx = maxSpeed
+  if (vx < -maxSpeed) vx = -maxSpeed
+  if (vy > maxSpeed) vy = maxSpeed
+  if (vy < -maxSpeed) vy = -maxSpeed
+
+  //aplicar movimiento
+  x += vx
+  y += vy
+
+  // friccion ligera
+  vx *= 0.99
+  vy *= 0.99
+
+  //wrap de pantalla
   if (x > canvas.width) x = 0
   if (x < 0) x = canvas.width
   if (y > canvas.height) y = 0
   if (y < 0) y = canvas.height
+
+  updateBullets()
 }
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
+
   update()
   drawShip()
+  drawBullets()
+
   requestAnimationFrame(loop)
 }
 
