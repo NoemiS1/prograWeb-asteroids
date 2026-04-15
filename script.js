@@ -8,6 +8,7 @@ let keys = {}
 let bullets = []
 let vx = 0
 let vy = 0
+let asteroids = []
 
 document.addEventListener('keydown', (e) => {
   keys[e.key] = true
@@ -26,11 +27,10 @@ function drawShip() {
   ctx.translate(x, y)
   ctx.rotate(angle)
 
-  
   if (keys['ArrowUp']) {
     ctx.beginPath()
     ctx.moveTo(-10, 5)
-    ctx.lineTo(-18, 0 + (Math.random() * 6 - 3)) 
+    ctx.lineTo(-18, 0 + (Math.random() * 6 - 3))
     ctx.lineTo(-10, -5)
     ctx.strokeStyle = 'orange'
     ctx.stroke()
@@ -78,6 +78,29 @@ function updateBullets() {
   )
 }
 
+function createAsteroid(x, y, size) {
+  const angle = Math.random() * Math.PI * 2
+  const speed = Math.random() * 1 + 0.3 // más lento
+
+  const points = []
+  const vertices = 8
+
+  for (let i = 0; i < vertices; i++) {
+    const ang = ((Math.PI * 2) / vertices) * i
+    const radius = size + (Math.random() * 10 - 5) // irregularidad
+    points.push({ angle: ang, radius: radius })
+  }
+
+  asteroids.push({
+    x: x,
+    y: y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    size: size,
+    shape: points
+  })
+}
+
 function update() {
   //rotacion
   if (keys['ArrowLeft']) angle -= 0.05
@@ -112,6 +135,49 @@ function update() {
   if (y < 0) y = canvas.height
 
   updateBullets()
+  updateAsteroids()
+}
+
+function drawAsteroids() {
+  asteroids.forEach((a) => {
+    ctx.beginPath()
+
+    a.shape.forEach((p, i) => {
+      const px = a.x + Math.cos(p.angle) * p.radius
+      const py = a.y + Math.sin(p.angle) * p.radius
+
+      if (i === 0) {
+        ctx.moveTo(px, py)
+      } else {
+        ctx.lineTo(px, py)
+      }
+    })
+
+    ctx.closePath()
+    ctx.strokeStyle = 'white'
+    ctx.stroke()
+  })
+}
+
+function updateAsteroids() {
+  asteroids.forEach((a) => {
+    a.x += a.vx
+    a.y += a.vy
+
+    // wrap de pantalla
+    if (a.x > canvas.width) a.x = 0
+    if (a.x < 0) a.x = canvas.width
+    if (a.y > canvas.height) a.y = 0
+    if (a.y < 0) a.y = canvas.height
+  })
+}
+
+for (let i = 0; i < 4; i++) {
+  createAsteroid(
+    Math.random() * canvas.width,
+    Math.random() * canvas.height,
+    35 //para el tamaño grande
+  )
 }
 
 function loop() {
@@ -120,7 +186,7 @@ function loop() {
   update()
   drawShip()
   drawBullets()
-
+  drawAsteroids()
   requestAnimationFrame(loop)
 }
 
