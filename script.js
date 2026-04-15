@@ -26,6 +26,17 @@ function drawShip() {
   ctx.translate(x, y)
   ctx.rotate(angle)
 
+  
+  if (keys['ArrowUp']) {
+    ctx.beginPath()
+    ctx.moveTo(-10, 5)
+    ctx.lineTo(-18, 0 + (Math.random() * 6 - 3)) 
+    ctx.lineTo(-10, -5)
+    ctx.strokeStyle = 'orange'
+    ctx.stroke()
+  }
+
+  // nave
   ctx.beginPath()
   ctx.moveTo(15, 0)
   ctx.lineTo(-10, 10)
