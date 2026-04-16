@@ -101,6 +101,16 @@ function createAsteroid(x, y, size) {
   })
 }
 
+function splitAsteroid(asteroid) {
+  if (asteroid.size === 35) {
+    createAsteroid(asteroid.x, asteroid.y, 20)
+    createAsteroid(asteroid.x, asteroid.y, 20)
+  } else if (asteroid.size === 20) {
+    createAsteroid(asteroid.x, asteroid.y, 10)
+    createAsteroid(asteroid.x, asteroid.y, 10)
+  }
+}
+
 function update() {
   //rotacion
   if (keys['ArrowLeft']) angle -= 0.05
@@ -137,7 +147,16 @@ function update() {
   updateBullets()
   updateAsteroids()
   checkBulletAsteroidCollisions()
-  
+
+  if (asteroids.length === 0) {
+  for (let i = 0; i < 4; i++) {
+    createAsteroid(
+      Math.random() * canvas.width,
+      Math.random() * canvas.height,
+      35
+      )
+    }
+  }
 }
 
 function drawAsteroids() {
@@ -169,10 +188,11 @@ function checkBulletAsteroidCollisions() {
       const dist = Math.sqrt(dx * dx + dy * dy)
 
       if (dist < asteroids[j].size) {
+        splitAsteroid(asteroids[j])
         bullets.splice(i, 1)
         asteroids.splice(j, 1)
         break
-      }
+}
     }
   }
 }
