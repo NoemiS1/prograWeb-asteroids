@@ -136,6 +136,8 @@ function update() {
 
   updateBullets()
   updateAsteroids()
+  checkBulletAsteroidCollisions()
+  
 }
 
 function drawAsteroids() {
@@ -157,6 +159,22 @@ function drawAsteroids() {
     ctx.strokeStyle = 'white'
     ctx.stroke()
   })
+}
+
+function checkBulletAsteroidCollisions() {
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    for (let j = asteroids.length - 1; j >= 0; j--) {
+      const dx = bullets[i].x - asteroids[j].x
+      const dy = bullets[i].y - asteroids[j].y
+      const dist = Math.sqrt(dx * dx + dy * dy)
+
+      if (dist < asteroids[j].size) {
+        bullets.splice(i, 1)
+        asteroids.splice(j, 1)
+        break
+      }
+    }
+  }
 }
 
 function updateAsteroids() {
