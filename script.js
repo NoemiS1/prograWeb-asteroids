@@ -149,12 +149,8 @@ function update() {
   checkBulletAsteroidCollisions()
 
   if (asteroids.length === 0) {
-  for (let i = 0; i < 4; i++) {
-    createAsteroid(
-      Math.random() * canvas.width,
-      Math.random() * canvas.height,
-      35
-      )
+    for (let i = 0; i < 4; i++) {
+      createAsteroid(Math.random() * canvas.width, Math.random() * canvas.height, 35)
     }
   }
 }
@@ -192,7 +188,7 @@ function checkBulletAsteroidCollisions() {
         bullets.splice(i, 1)
         asteroids.splice(j, 1)
         break
-}
+      }
     }
   }
 }
